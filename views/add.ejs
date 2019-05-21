@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partials/head %>
+  </head>
+  <body>
+    <header>
+        <% include partials/header %>
+    </header>
+    <% if(errors) { %>
+      <% errors.forEach(function(error) { %>
+        <p class="alert alert-danger"><%= error.msg %></p>
+      <% }) %>
+    <% } %>
+    <div class="container">
+      <div class="panel panel-primary">
+        <div class="panel-heading">
+           Add User
+        </div>
+        <div class="panel-body">
+          <form method="post" action="/user/add">
+            <div class="form-group">
+              <label class="col-md-4">Name</label>
+              <input type="text" class="form-control" name="name"/>
+            </div>
+            <div class="form-group">
+              <label class="col-md-4">Email</label>
+              <input type="text" class="form-control" name="email"/>
+              </div>
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Add User</button>
+              </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+        <% include partials/footer %>
+    </footer>
+  </body>
+</html>

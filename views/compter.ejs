@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <% include partials/head %>
+        <script src="/socket.io/socket.io.js"></script>
+        <script>
+            var socket = io.connect('http://localhost:8080');
+            socket.on('message', function(message) {
+                alert('Le serveur a un message pour vous : '+message)
+            })
+
+            function myFunction() {
+                socket.emit('message', 'Coucou le serveur')
+            }
+        </script>
+    </head>
+    <body>
+        <header>
+            <% include partials/header %>
+        </header>
+        <h1>Je vais compter jusqu'à <%= nombre %></h1>
+
+        <p><%
+            for(var i = 1 ; i <= nombre ; i++) {
+            %>
+
+            <%= i %>... 
+
+        <% } %></p>
+
+        <p>Tant que j'y suis, je prends un nom au hasard qu'on m'a envoyé :
+        <%= noms[Math.round(Math.random() * (noms.length - 1))] %>
+        </p>
+
+        <input type="button" value="Embêter le serveur" id="poke" onclick="myFunction()"/>
+        <header>
+            <% include partials/footer %>
+        </header>
+    </body>
+</html>
