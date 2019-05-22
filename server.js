@@ -8,8 +8,11 @@ const app = express();
 const server = require('http').createServer(app);
 const user = require('./routes/user.route');
 
-const io = require('socket.io').listen(server)
-const ios = require('socket.io-express-session')
+const io = require('socket.io').listen(server);
+const ios = require('socket.io-express-session');
+
+const port = 8080;
+const db = require('./queries');
 
 let session = expressSession({
     secret: 'alexis',
@@ -27,11 +30,16 @@ app.use(cookeParser());
 app.use(session);
 app.use(expressValidator());
 
-app.use('/user', user);
+app.use('/login', user);
+app.get('/users', db.getUsers)
+app.get('/users/:id', db.getUserById)
+app.post('/users', db.createUser)
+app.put('/users/:id', db.updateUser)
+app.delete('/users/:id', db.deleteUser)
 
 app.get('/', function(req, res) {
     res.setHeader('Content-Type', 'text/plain');
-    res.send('Vous êtes à l\'accueil, que puis-je pour vous ?');
+    //res.json({ info: 'Node.js, Express, and Postgres API' });
 });
 
 app.get('/compter/:nombre', function(req, res) {
@@ -64,6 +72,9 @@ io.sockets.on('connection', function(socket) {
     } else {
         console.log('Connecté en tant que '+session.user.name);
         session.user.socket = socket.id;
+        db.createUser(function({name: session.user.name, email: session.user.email}) {
+            console.log('user created')
+        });
     }
     console.log(JSON.stringify(session.user));
 
@@ -72,8 +83,6 @@ io.sockets.on('connection', function(socket) {
     });
 });
 
-server.listen(8080);
-
-/*server.on('close', function() {
-    console.log("Bye bye");
-})*/
+server.listen(port, function() {
+    console.log('App running on port '+port);
+});

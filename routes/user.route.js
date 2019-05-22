@@ -17,7 +17,7 @@ router.post('/add', function(req, res) {
     const errors = req.validationErrors();
     if(errors){
        req.session.errors = errors;
-       res.redirect('/user');
+       res.redirect('/login');
     }
     else{
        req.session.success = true;

@@ -1,4 +1,9 @@
 {
+  "name": "node-chat",
+  "version": "1.0.0",
+  "description": "Simple chat using Node.js and express",
+  "main": "server.js",
+  "license": "MIT",
   "dependencies": {
     "body-parser": "^1.19.0",
     "bootstrap": "^4.3.1",
@@ -8,6 +13,7 @@
     "express-session": "^1.16.1",
     "express-validator": "^5.3.1",
     "path": "^0.12.7",
+    "pg": "^7.11.0",
     "socket.io": "^2.2.0",
     "socket.io-express-session": "^0.1.3"
   }
