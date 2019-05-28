@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partials/head %>
+  </head>
+  <body>
+    <header>
+        <% include partials/header %>
+    </header>
+    <form method="post" action="/join" >
+        <div class="form-group">
+            <label>First name</label>
+            <input type="text" class="form-control" name="fname"/>
+        </div>
+        <div class="form-group">
+            <label>Last name</label>
+            <input type="text" class="form-control" name="lname"/>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" class="form-control" name="mail"/>
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" class="form-control" name="pwd"/>
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create account</button>
+          </div>
+    </form>
+    <footer>
+        <% include partials/footer %>
+    </footer>
+  </body>
+</html>
