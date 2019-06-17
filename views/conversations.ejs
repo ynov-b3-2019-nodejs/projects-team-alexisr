@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <% include partials/head %>
+  </head>
+  <body>
+    <header>
+        <% include partials/header %>
+    </header>
+    <button type="button" class="btn btn-link"><a href="/conversations/new">Nouvelle conversation</a></button><br/><br/>
+    <% Object.keys(convs).forEach(function(key) { %>
+      <!--<%= key %>-->
+      <b><a href="/conversations/<%= key %>"" style="color: black">Conversation</a></b><br/>
+      <% convs[key].forEach(function(elt) { %>
+        <%= elt.first_name %> <%= elt.last_name %><br/>
+      <% }) %>
+      <br/><br/>
+    <% }); %>
+    <footer>
+        <% include partials/footer %>
+    </footer>
+  </body>
+</html>

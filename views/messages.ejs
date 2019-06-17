@@ -2,13 +2,113 @@
 <html>
   <head>
     <% include partials/head %>
+    <style>
+      .sidenav {
+        height: 100%; /* Full-height: remove this if you want "auto" height */
+        width: 160px; /* Set the width of the sidebar */
+        position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+        z-index: 0; /* Stay on top */
+        top: 0; /* Stay at the top */
+        left: 0;
+        background-color: #111; /* Black */
+        overflow-x: hidden; /* Disable horizontal scroll */
+        padding-top: 100px;
+      }
+
+      .main {
+        margin-left: 160px; 
+        padding: 0px 10px;
+      }
+    </style>
+    <script>
+
+      socket.on('message', function(message) {
+        //alert('Le serveur a un message pour vous : '+message)
+      });
+      socket.on('messageSaved', function(usr, msg, conv) {
+        if("<%= conv_id %>" == conv.toString()) {
+          insereMessage(usr, msg);
+        }
+        else {
+          socket.emit('message', 'Conv differentes');
+        }
+      });
+      $(document).ready(function(){
+        $("body").on("submit", "#formulaire_chat",function(e){
+
+          socket.emit('message', 'envoyé');
+          socket.emit('ecrit', false);
+          e.preventDefault();
+          socket.emit('saveToDb', "<%= userData.id %>", "<%= userData.first_name %>", "<%= conv_id %>", $("#content").val());
+          insereMessage("<%= userData.first_name %>", $("#content").val());
+          $('#content').val('').focus();
+        });
+      });
+
+      function insereMessage(fname, msg) {
+        $('#zone_chat').append('<b>' + fname + ' :</b> ' + msg+ '<br/>');
+      }
+
+      document.addEventListener('keyup', function() {
+        if($("#content").val().length > 0) {
+          socket.emit('ecrit', true, "<%= userData.first_name %>", "<%= conv_id %>");
+        } else {
+          socket.emit('ecrit', false, "<%= userData.first_name %>", "<%= conv_id %>");
+        }
+      });
+
+      socket.on('ecrit', function(writing, fname, conv) {
+        if(writing == true && conv.toString() == "<%= conv_id %>") {
+          $("#ecrit").attr('hidden', false);
+        } else {
+          $("#ecrit").attr('hidden', true);
+        }
+        document.getElementById('name_writing').innerHTML = fname;
+      });
+
+      socket.on('authenticated', function(authTab) {
+        authTab.forEach(function(element) {
+            if(element[1] === "true") {
+                $('#'+element[0]).css('background-color', 'green');
+                //$('#'+element[0]).attr('hidden', true);
+            } else {
+                $('#'+element[0]).css('background-color', 'red');
+            }
+        });
+    });
+    </script>
   </head>
   <body>
-    <header>
-        <% include partials/header %>
-    </header>
+    <div class="sidenav">
+
+      <%if(users) {
+          users.forEach(function(user) { %>
+            <span id="connected" name="connected" class="col-5 text-center text-nowrap" style="color: white">   <span id="<%= user.id %>" name="<%= user.id %>" class="dot" style="height: 12px; width: 12px; border-radius: 100%;display: inline-block;"></span><%= user.first_name %></span><br/>
+          <% }); %>
+        <% } %>
+      </div>
+      <header>
+          <% include partials/header %>
+      </header> 
+    <div class="main">
+        
+    <form action="/conversations/<%= conv_id %>" id="formulaire_chat" type="post">
+      <input type="text" id="content" name="content" placeholder="Your message..." size="50" autofocus />
+      <input type="submit" name="envoi_message" id="envoi_message" value="Envoyer"/>
+      <span id="ecrit" name="ecrit" hidden><i><span id='name_writing'></span> est en train d'écrire....</i></span>
+    </form>
+    <br/>
+    <% if(msgs) {
+      msgs.forEach(function(element) { %>
+        <b><%= element.first_name %> :</b> <%= element.content %><br/>
+    <% });
+      } %>
+
+    <section id="zone_chat">
+    </section>
     <footer>
         <% include partials/footer %>
     </footer>
+  </div>
   </body>
 </html>

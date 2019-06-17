@@ -1,75 +1,40 @@
+<script>
+    let auth = "<%=authenticated%>";
+    if(auth) {
+        socket.emit('authenticated', "<%=authenticated%>", "<%=userData.id%>");
+    }
+
+    function logout() {
+        socket.emit('authenticated', "false", "<%=userData.id%>")
+    }
+</script>
+
 <nav class="navbar navbar-icon-top navbar-expand-lg navbar-dark bg-dark">
-<a class="navbar-brand" href="#"><%=title%></a>
+<a class="navbar-brand" href="/conversations"><%=title%></a>
 <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
 </button>
 
 <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-    <li class="nav-item active">
-        <a class="nav-link" href="#">
-        <i class="fa fa-home"></i>
-        Home
-        <span class="sr-only">(current)</span>
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link" href="#">
-        <i class="fa fa-envelope-o">
-            <span class="badge badge-danger">11</span>
-        </i>
-        Link
-        </a>
-    </li>
-    <li class="nav-item">
-        <a class="nav-link disabled" href="#">
-        <i class="fa fa-envelope-o">
-            <span class="badge badge-warning">11</span>
-        </i>
-        Disabled
-        </a>
-    </li>
-    <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-        <i class="fa fa-envelope-o">
-            <span class="badge badge-primary">11</span>
-        </i>
-        Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-        <a class="dropdown-item" href="#">Action</a>
-        <a class="dropdown-item" href="#">Another action</a>
-        <div class="dropdown-divider"></div>
-        <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-    </li>
+    <ul class="navbar-nav col-sm-10">
     </ul>
     <% if(authenticated == false) {%>
-    <ul class="navbar-nav ">
+    <ul class="navbar-nav navbar-fixed-top col-sm-2 justify-content-sm-right">
     <li class="nav-item">
         <a class="nav-link" href="/join">
-        <i class="fa fa-bell">
-            <span class="badge badge-info">11</span>
-        </i>
         Sign up
         </a>
     </li>
     <li class="nav-item">
         <a class="nav-link" href="/login">
-        <i class="fa fa-globe">
-            <span class="badge badge-success">11</span>
-        </i>
         Login
         </a>
     </li>
     </ul>
     <% } else { %>
-    <ul class="navbar-nav ">
+    <ul class="navbar-nav col-sm-1 justify-content-sm-right">
     <li class="nav-item">
-        <a class="nav-link" href="/logout">
-        <i class="fa fa-bell">
-            <span class="badge badge-info">11</span>
-        </i>
+        <a class="nav-link text-right" href="/logout" onclick="logout();">
         Log out
         </a>
     </li>
@@ -97,7 +62,7 @@
     }
     if(messages.success) {
         if(messages.success.length) { %>
-            <div class="alert alert-success alert-dismissable">
+            <div class="alert alert-success alert-dismissable" role="alert" id="alert">
                 <a class="close" data-dismiss="alert" aria-label="close">&times;</a>
                 <strong><%= messages.success%></strong>
             </div>

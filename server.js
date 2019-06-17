@@ -8,6 +8,7 @@ const flash = require('connect-flash');
 const passport = require('passport');
 const request = require('request');
 const path = require('path');
+const uuidv4 = require('uuid/v4');
 
 const app = express();
 const server = require('http').createServer(app);
@@ -23,6 +24,28 @@ let session = expressSession({
     resave: true,
     saveUninitialized: true
 });
+
+let client;
+const getClient = async () => {
+   if (client) {
+      return client;
+   }
+
+   client = await db.pool.connect();
+   await client.query('BEGIN');
+
+   return client;   
+}
+
+let tabUser = [["0", "false"]];
+function getIndexOf(arr, k) {
+    for (var i = 0; i < arr.length; i++) {
+        var index = arr[i].indexOf(k);
+        if (index > -1) {
+        return [i, index];
+        }
+    }
+}
 
 io.use(ios(session));
 
@@ -49,25 +72,14 @@ app.post('/users', db.createUser)
 app.put('/users/:id', db.updateUser)
 app.delete('/users/:id', db.deleteUser)
 
-app.get('/compter/:nombre', function(req, res) {
-    if(!isNaN(req.params.nombre) && req.params.nombre > 0) {
-        let tNoms = ['Alexis', 'Bob', 'Peter'];
-        let a = tNoms.length;
-        res.render('compter.ejs', {nombre: req.params.nombre, noms: tNoms, title: 'Compter'});
-    } else {
-        res.setHeader('Content-Type', 'text/plain');
-        res.status(404).send('Page introuvable !');
-    }
-})
-
 app.use(function(req, res, next){
     res.setHeader('Content-Type', 'text/plain');
     res.status(404).send('Page introuvable !');
 });
 
 io.sockets.on('connection', function(socket) {
-    socket.emit('message', 'Vous etes bien connecté !');
-    socket.broadcast.emit('message', 'Un autre client vient de se connecter !');
+    //socket.emit('message', 'Vous etes bien connecté !');
+    //socket.broadcast.emit('message', 'Un autre client vient de se connecter !');
     console.log(socket.handshake.session);
     console.log('socket : '+socket.id)
 
@@ -82,7 +94,61 @@ io.sockets.on('connection', function(socket) {
     console.log(JSON.stringify(session.user));
 
     socket.on('message', function(message) {
+        socket.emit('message', message);
         console.log('Un message du client : '+message);
+    });
+
+    socket.on('saveToDb', async function(user, fname, conv, msg) {
+        console.log('Saving to DB');
+        console.log('User : '+user);
+        console.log('Conversation : '+conv);
+        console.log('Message : '+msg);
+
+        await getClient();
+
+        await JSON.stringify(client.query('INSERT INTO messages(id, user_id, conversation_id, content) VALUES($1, $2, $3, $4)', [uuidv4(), user, conv, msg], function(err, result) {
+            if(err) {
+                console.log(err);
+            } else {
+                client.query('COMMIT');
+                console.log('Message Saved');
+                socket.broadcast.emit('messageSaved', fname, msg, conv);
+            }
+        }));
+    });
+
+    socket.on('ecrit', function(writing, fname, conv) {
+        socket.broadcast.emit('ecrit', writing, fname, conv);
+    });
+    
+    socket.on('authenticated', async function(auth, uid) {
+        console.log(uid + " is " + auth);
+
+        await getClient();
+
+        await JSON.stringify(client.query('SELECT * FROM users', function(err, result) {
+            if(err) {
+                console.log(err);
+            } else {
+                result.rows.forEach(function(element) {
+                    if(!tabUser.some(row => row.includes(element.id))) {
+                        tabUser.push([-1, "false"]);
+                        let j = getIndexOf(tabUser, -1)[0];
+                        tabUser[j][0] = element.id;
+                    }
+                });
+            }
+        }));
+        
+        if(!tabUser.some(row => row.includes(uid))) {
+            tabUser.push([-1, "false"]);
+            let j = getIndexOf(tabUser, -1)[0];
+            tabUser[j][0] = uid;
+        }
+        let i = getIndexOf(tabUser, uid)[0];
+        tabUser[i][1] = auth;
+
+        socket.emit('authenticated', tabUser);
     });
 });
 
