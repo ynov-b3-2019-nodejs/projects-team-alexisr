@@ -94,8 +94,8 @@
         
     <form action="/conversations/<%= conv_id %>" id="formulaire_chat" type="post">
       <input type="text" id="content" name="content" placeholder="Your message..." size="50" autofocus />
-      <input type="submit" name="envoi_message" id="envoi_message" value="Envoyer"/>
-      <span id="ecrit" name="ecrit" hidden><i><span id='name_writing'></span> est en train d'écrire....</i></span>
+      <input type="submit" name="envoi_message" id="envoi_message" value="Send"/>
+      <span id="ecrit" name="ecrit" hidden><i><span id='name_writing'></span> is typing....</i></span>
     </form>
     <br/>
     <% if(msgs) {

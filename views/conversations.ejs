@@ -7,7 +7,7 @@
     <header>
         <% include partials/header %>
     </header>
-    <button type="button" class="btn btn-link"><a href="/conversations/new">Nouvelle conversation</a></button><br/><br/>
+    <button type="button" class="btn btn-link"><a href="/conversations/new">New conversation</a></button><br/><br/>
     <% Object.keys(convs).forEach(function(key) { %>
       <!--<%= key %>-->
       <b><a href="/conversations/<%= key %>"" style="color: black">Conversation</a></b><br/>

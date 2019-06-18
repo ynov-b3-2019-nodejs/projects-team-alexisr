@@ -93,7 +93,7 @@ module.exports =  function(app) {
    });
 
    app.get('/join', function (req, res, next) {
-      res.render('join', {title: 'Join', authenticated: req.isAuthenticated(), userData: req.user[0], messages: {danger: req.flash('danger'), warning: req.flash('warning'), success: req.flash('success')}});
+      res.render('join', {title: 'Join', authenticated: req.isAuthenticated(), userData: req.user ? req.user[0] : {id: 0}, messages: {danger: req.flash('danger'), warning: req.flash('warning'), success: req.flash('success')}});
       
       console.log(req.user);
    });
